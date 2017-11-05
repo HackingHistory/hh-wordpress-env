@@ -103,7 +103,7 @@ _log_last_exit_colorize() {
   else
     echo "$2" |& _colorize
     exit 1
-  fi  
+  fi
 }
 
 _get_volumes() {
@@ -125,7 +125,7 @@ _get_volumes() {
 }
 
 _wp() {
-  wp --allow-root "$@" 
+  wp --allow-root "$@"
 }
 
 # FIXME: Remove in next version
@@ -214,14 +214,14 @@ check_database() {
 
   # No backups found
   if [[ "$( find /data -name "*.sql" 2>/dev/null | wc -l )" -eq 0 ]]; then
-    _wp core install 
+    _wp core install
     _log_last_exit_colorize "Success: core install" "Error: core install failed!"
 
     return
   fi
 
   data_path=$( find /data -name "*.sql" -print -quit )
-  _wp db import "$data_path" 
+  _wp db import "$data_path"
   _log_last_exit_colorize "Success: db import" "Error: db import failed!"
 
   if [[ -n "$URL_REPLACE" ]]; then
@@ -254,10 +254,10 @@ check_plugins() {
   for key in "${to_install[@]}"; do
     wp plugin install --allow-root "$key"
     _log_last_exit_colorize "Success: $key plugin installed" "Error: $key plugin install failure!"
-  done  
+  done
 
   [[ "${#to_remove}" -gt 0 ]] && _wp plugin delete "${to_remove[@]}"
-  _wp plugin activate --all 
+  _wp plugin activate --all
   _log_last_exit_colorize "Success: plugin activate all" "Error: plugin activate all failed!"
  }
 
@@ -276,9 +276,9 @@ check_themes() {
   fi
 
   for key in "${to_install[@]}"; do
-    wp theme install --allow-root "$key" 
+    wp theme install --allow-root "$key"
     _log_last_exit_colorize "Success: $key theme install " "Error: $key theme install failed!"
-  done 
+  done
 
   for theme in $(wp theme list --field=name --status=inactive --allow-root); do
     [[ ${theme_deps[$theme]} ]] && continue
@@ -287,7 +287,7 @@ check_themes() {
   done
 
   for key in "${to_remove[@]}"; do
-    wp theme delete --allow-root "$key" 
+    wp theme delete --allow-root "$key"
     _log_last_exit_colorize "Success: $key theme deleted" "Error: $key theme delete failed!"
   done
 
@@ -306,7 +306,7 @@ main() {
 
   h2 "Configuring WordPress"
   rm -f /app/wp-config.php
-  _wp core config 
+  _wp core config
   _log_last_exit_colorize "Success: core config" "Error: core config failed!"
 
   h2 "Checking database"
