@@ -3,6 +3,7 @@
 
 # Environment
 # ------------
+#!/bin/bash
 ADMIN_EMAIL=${ADMIN_EMAIL:-"admin@${DB_NAME:-wordpress}.com"}
 DB_HOST=${DB_HOST:-db}
 DB_NAME=${DB_NAME:-wordpress}
@@ -15,6 +16,9 @@ WP_VERSION=${WP_VERSION:-latest}
 URL_REPLACE=${URL_REPLACE:-"$SEARCH_REPLACE"}
 BEFORE_URL="${URL_REPLACE%,*}"
 AFTER_URL="${URL_REPLACE#*,}"
+# dev theme option
+# I don't know how to do the replacement in bash so skipping
+# DEV_THEME_NAME=${DEV_THEME_NAME:"${DEV_THEME_URL:"}
 
 declare -A plugin_deps
 declare -A theme_deps
@@ -103,7 +107,7 @@ _log_last_exit_colorize() {
   else
     echo "$2" |& _colorize
     exit 1
-  fi  
+  fi
 }
 
 _get_volumes() {
@@ -125,7 +129,7 @@ _get_volumes() {
 }
 
 _wp() {
-  wp --allow-root "$@" 
+  wp --allow-root "$@"
 }
 
 # FIXME: Remove in next version
@@ -214,14 +218,14 @@ check_database() {
 
   # No backups found
   if [[ "$( find /data -name "*.sql" 2>/dev/null | wc -l )" -eq 0 ]]; then
-    _wp core install 
+    _wp core install
     _log_last_exit_colorize "Success: core install" "Error: core install failed!"
 
     return
   fi
 
   data_path=$( find /data -name "*.sql" -print -quit )
-  _wp db import "$data_path" 
+  _wp db import "$data_path"
   _log_last_exit_colorize "Success: db import" "Error: db import failed!"
 
   if [[ -n "$URL_REPLACE" ]]; then
@@ -254,10 +258,10 @@ check_plugins() {
   for key in "${to_install[@]}"; do
     wp plugin install --allow-root "$key"
     _log_last_exit_colorize "Success: $key plugin installed" "Error: $key plugin install failure!"
-  done  
+  done
 
   [[ "${#to_remove}" -gt 0 ]] && _wp plugin delete "${to_remove[@]}"
-  _wp plugin activate --all 
+  _wp plugin activate --all
   _log_last_exit_colorize "Success: plugin activate all" "Error: plugin activate all failed!"
  }
 
@@ -276,9 +280,9 @@ check_themes() {
   fi
 
   for key in "${to_install[@]}"; do
-    wp theme install --allow-root "$key" 
+    wp theme install --allow-root "$key"
     _log_last_exit_colorize "Success: $key theme install " "Error: $key theme install failed!"
-  done 
+  done
 
   for theme in $(wp theme list --field=name --status=inactive --allow-root); do
     [[ ${theme_deps[$theme]} ]] && continue
@@ -287,9 +291,48 @@ check_themes() {
   done
 
   for key in "${to_remove[@]}"; do
-    wp theme delete --allow-root "$key" 
+    wp theme delete --allow-root "$key"
     _log_last_exit_colorize "Success: $key theme deleted" "Error: $key theme delete failed!"
   done
+
+}
+
+# do something similar for dev plugin I guess
+get_dev_theme() {
+  echo "vars $DEV_THEME_REPONAME $DEV_THEME_USERNAME"
+  if [[ $DEV_THEME_USERNAME && $DEV_THEME_REPONAME ]]; then
+    if [ -z "$(ls -A /app/wp-content/themes/dev-theme/)" ]; then
+      cd /app/wp-content/themes/
+      git clone "https://github.com/$DEV_THEME_USERNAME/${DEV_THEME_REPONAME}.git" \
+          /app/wp-content/themes/dev-theme/
+      _log_last_exit_colorize "Success: $DEV_THEME_URL repo has been cloned."\
+                              "Error: unable to clone $DEV_THEME_URL"
+    else
+      echo "dev-theme folder not empty, not cloning"
+    fi
+  elif [[ $DEV_THEME_REPONAME || $DEV_THEME_USERNAME ]]; then
+    echo "Please provide both the DEV_THEME_USERNAME and the DEV_THEME_REPONAME variables in order to download the dev theme"
+  else
+    echo "No Dev Theme URL provided"
+  fi
+  chmod -R a+rw /app/wp-content/themes/dev-theme/
+  _wp theme activate dev-theme
+  _log_last_exit_colorize "Success: activated $DEV_THEME_URL theme." \
+                              "Error: unable to activate $DEV_THEME_URL"
+  }
+function add_local_scripts() {
+  echo "made it into add_local_scripts"
+  # for f in "/app/wp-content/themes/local-scripts"/*; do
+  #  echo "trying to run $f"
+  #  if [[ -f $f ]]; then
+  #     exec /app/wp-content/themes/local-scripts/$f &
+  #     _log_last_exit_colorize "Success: /local-scripts/$f ran without errors." \
+  #                             "Failure: unable to run /local-scripts/$f ."
+  #  fi
+  # done
+  echo "running watch-underscores manually"
+  /local-scripts/watch-underscores.sh &
+  echo "any sign of success"?
 
 }
 
@@ -306,7 +349,7 @@ main() {
 
   h2 "Configuring WordPress"
   rm -f /app/wp-config.php
-  _wp core config 
+  _wp core config
   _log_last_exit_colorize "Success: core config" "Error: core config failed!"
 
   h2 "Checking database"
@@ -324,6 +367,12 @@ main() {
   h2 "Checking plugins"
   check_plugins
 
+  h2 "Installing development theme"
+  get_dev_theme
+
+  h2 "Running local scripts from /local-scripts directory"
+  add_local_scripts
+
   h2 "Finalizing"
   if [[ "$MULTISITE" != 'true' ]]; then
     _wp rewrite structure "$PERMALINKS"
@@ -336,8 +385,8 @@ main() {
   chown -R www-data /app /var/www/html
   find /app -type d -exec chmod 755 {} \;
   find /app -type f -exec chmod 644 {} \;
-  find /app \( -type f -or -type d \) ! -group root -exec chmod g+rw {} \;
-
+  find /app \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
+  chmod -R a+rw /app/wp-content/
   h1 "WordPress Configuration Complete!"
 
   rm -f /var/run/apache2/apache2.pid
