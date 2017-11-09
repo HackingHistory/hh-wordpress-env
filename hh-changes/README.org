@@ -1,0 +1,24 @@
+* Install Hacking Histoyr wordpress distro painlessly
+
+This set of scripts will set up a Wordpress development environment that will work on any major desktop platform (Mac, Windows, Linux). It is designed around the needs of students in [[https://hackinghistory.ca][Hacking History]], a 4th year undergraduate seminar at the Unviersity of Toronto.  
+
+** How it works
+
+We use *Docker* and *the Wordpress Command Line Interface* to construct a "virtual environment" on your laptop. Aordpress and all the other services it depends on  (including a webserver and  a database server) will run in a "container" which can be accessed through the *command line* or through a *graphical front-end* (on Mac and Windows). You can also browse the local Wordpress stie by pointing your browser at [[http://localhost:8080][localhost:8080]].  
+
+** Acknowledgements
+- thanks to *wordpress-starter* for the inspiration and much of the code. Kept it mostly because the color coding is so awesome
+- thanks to the official *wp-cli* image for a starting point
+
+** TODO 
+- [ ] check whether I can use apt-get or not. If not, need to rewrite the wp-cli code
+- [ ] decide how  to manage db import and syncing.  Might be easier to use a plugin, and maybe (???) even write a row to the db with a secret key passed as an environment variable (that could work with dp-sync, for instance)
+- [ ] remove all deprecated stuff.
+- [ ] don't fail if DB already exists. Instead, continue silently.
+- [ ] remove multisite stuff, I htink
+- [ ] add a "build-finalizer" for ocmpletely local steps. Like, maybe we could add gulp watch.
+- [ ] but since this wlast step will depend on the theme, maybe the smart thing to do is to add this script to the theme repo
+  - In which case might be better t ocall it something else.
+  - like, there might be a ~wp-docker-final-script.sh~ in the foot dir of the theme
+  - which just does a ~npm install -d && gulp watch~. That would be cool.
+- [ ] Add node and sass dependencies, either in dockerfile or via docker-compose, with another machine that adds node. 
