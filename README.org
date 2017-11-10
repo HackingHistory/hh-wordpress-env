@@ -1,17 +1,18 @@
 * Install Hacking History wordpress distro painlessly
 
-This set of scripts will set up a Wordpress development environment that will work on any major desktop platform (Mac, Windows, Linux). It is designed around the needs of students in [[https://hackinghistory.ca][Hacking History]], a 4th year undergraduate seminar at the Unviersity of Toronto, and based on the work of of [[https://github.com/visiblevc/wordpress-starter][visiblevc]], from which obth the docker image and the run scripts are derived.
+This set of scripts will set up a Wordpress development environment that will work on any major desktop platform (Mac, Windows, Linux). It is designed around the needs of students in [[https://hackinghistory.ca][Hacking History]], a 4th year undergraduate seminar at the Unviersity of Toronto, and based on the work of of [[https://github.com/visiblevc/wordpress-starter][visiblevc]], from which both the docker image and the run scripts are derived.
 
 ** How it works
 
-We use [[https://docs.docker.com/][Docker]] and [[http://wp-cli.org/][the Wordpress Command Line Interface]] to construct a "virtual environment" on your laptop. Wordpress and all the other services it depends on  (including a webserver and  a database server) will run in "containers" which can be accessed through the *command line* or through a *graphical front-end* (on Mac and Windows). You can also browse the local Wordpress site by pointing your browser at [[http://localhost:8080][localhost:8080]].
+We use [[https://docs.docker.com/][Docker]] and [[http://wp-cli.org/][the Wordpress Command Line Interface]] to construct a "virtual environment" on your laptop. Wordpress and all the other services it depends on  (including a webserver and  a database server) will run in "containers" which can be accessed through the *command line*. You can also browse the local Wordpress site by pointing your browser at [[http://localhost:8080][localhost:8080]], and you can edit the theme files in Atom. Any changes you make will be visible in the browser window on refresh.
 ** Usage
 - first get ready by downloading [[https://www.docker.com/][Docker]] for [[https://www.docker.com/docker-mac][Mac]] or [[https://www.docker.com/docker-windows][Windows]] (if you are using Linux, use the terminal!)
-- clone this repo with ~git clone https://github.com/titaniumbones/wordpress-starter~
-- somehow access it in docker
-- run ~docker-compose up && docker-compose logs -f wordpress~
-- visit http://localhost:8080/ to see the wesite
-- in atom, edit [[./wp-content/themes/dev-theme/sass/theme/_theme_variables.scss]] to see changes live
+- clone this repo with Github desktop or directly with  ~git clone https://github.com/titaniumbones/wordpress-starter~
+- If you use Github, Desktop, the repository will probably be saved to ~/Users/yourname/Github/repositories/wordpress-starter/~ (Mac), or ~C:\User\Github\repositories\wprdpress-starter~. Navigate to that location using a terminal (Mac) or the "Powershell" environment that comes with DOcker for Windows (Windows).
+- From the main repository, run ~docker-compose up && docker-compose logs -f wordpress~. THe first time you do this, the process will ake about 10 minutes, so
+- go get a cup of coffee
+- come back and visit http://localhost:8080/ to see the website, whih is running live on your computer!
+- in Atom, edit ~REPOSITORY_ROOT/wp-content/themes/dev-theme/sass/theme/_theme_variables.scss~ or other files in the ~dev-theme~ directory tree. Changes will appear in your browser on refresh.
 ** Acknowledgements
 - thanks to *wordpress-starter* for the inspiration and much of the code. Kept it mostly because the color coding is so awesome
 - thanks to the official *wp-cli* image for a starting point
@@ -19,12 +20,12 @@ We use [[https://docs.docker.com/][Docker]] and [[http://wp-cli.org/][the Wordpr
 ** TODO
 - [ ] check whether I can use apt-get or not. If not, need to rewrite the wp-cli code
 - [ ] decide how  to manage db import and syncing.  Might be easier to use a plugin, and maybe (???) even write a row to the db with a secret key passed as an environment variable (that could work with dp-sync, for instance)
-- [ ] remove all deprecated stuff.
-- [ ] don't fail if DB already exists. Instead, continue silently.
+- [X] remove all deprecated stuff.
+- [X] don't fail if DB already exists. Instead, continue silently.
 - [ ] remove multisite stuff, I htink
-- [ ] add a "build-finalizer" for ocmpletely local steps. Like, maybe we could add gulp watch.
+- [X] add a "build-finalizer" for completely local steps. Like, maybe we could add gulp watch.
 - [ ] but since this wlast step will depend on the theme, maybe the smart thing to do is to add this script to the theme repo
   - In which case might be better t ocall it something else.
   - like, there might be a ~wp-docker-final-script.sh~ in the foot dir of the theme
   - which just does a ~npm install -d && gulp watch~. That would be cool.
-- [ ] Add node and sass dependencies, either in dockerfile or via docker-compose, with another machine that adds node.
+- [X] Add node and sass dependencies, either in dockerfile or via docker-compose, with another machine that adds node.
