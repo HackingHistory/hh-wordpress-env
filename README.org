@@ -1,4 +1,4 @@
-* Install Hacking Histoyr wordpress distro painlessly
+* Install Hacking History wordpress distro painlessly
 
 This set of scripts will set up a Wordpress development environment that will work on any major desktop platform (Mac, Windows, Linux). It is designed around the needs of students in [[https://hackinghistory.ca][Hacking History]], a 4th year undergraduate seminar at the Unviersity of Toronto, and based on the work of of [[https://github.com/visiblevc/wordpress-starter][visiblevc]], from which obth the docker image and the run scripts are derived.
 
