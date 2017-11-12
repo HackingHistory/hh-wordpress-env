@@ -19,6 +19,7 @@ AFTER_URL="${URL_REPLACE#*,}"
 # dev theme option
 # I don't know how to do the replacement in bash so skipping
 # DEV_THEME_NAME=${DEV_THEME_NAME:"${DEV_THEME_URL:"}
+DEV_THEME_BRANCH=${DEV_THEME_BRANCH:-master}
 
 declare -A plugin_deps
 declare -A theme_deps
@@ -301,10 +302,10 @@ check_themes() {
 get_dev_theme() {
   echo "vars $DEV_THEME_REPONAME $DEV_THEME_USERNAME"
   if [[ $DEV_THEME_USERNAME && $DEV_THEME_REPONAME ]]; then
-    if [ -z "$(ls -A /app/wp-content/themes/dev-theme/)" ]; then
+    if [ -z "$(ls -A /app/wp-content/themes/$DEV_THEME_REPONAME/)" ]; then
       cd /app/wp-content/themes/
-      git clone "https://github.com/$DEV_THEME_USERNAME/${DEV_THEME_REPONAME}.git" \
-          /app/wp-content/themes/dev-theme/
+      git clone --branch $DEV_THEME_BRANCH  "https://github.com/$DEV_THEME_USERNAME/${DEV_THEME_REPONAME}.git" \
+          /app/wp-content/themes/$DEV_THEME_REPONAME
       _log_last_exit_colorize "Success: $DEV_THEME_URL repo has been cloned."\
                               "Error: unable to clone $DEV_THEME_URL"
     else
@@ -315,10 +316,10 @@ get_dev_theme() {
   else
     echo "No Dev Theme URL provided"
   fi
-  chmod -R a+rw /app/wp-content/themes/dev-theme/
-  _wp theme activate dev-theme
-  _log_last_exit_colorize "Success: activated $DEV_THEME_URL theme." \
-                              "Error: unable to activate $DEV_THEME_URL"
+  chmod -R a+rw /app/wp-content/themes/$DEV_THEME_REPONAME
+  _wp theme activate $DEV_THEME_REPONAME || _log_last_exit_colorize \
+                                              "Success: activated $DEV_THEME_URL theme." \
+                                              "Error: unable to activate $DEV_THEME_URL"
   }
 function add_local_scripts() {
   echo "made it into add_local_scripts"
@@ -331,7 +332,7 @@ function add_local_scripts() {
   #  fi
   # done
   echo "running watch-underscores manually"
-  /local-scripts/watch-underscores.sh &
+  /local-scripts/watch-understrap.sh &
   echo "any sign of success"?
 
 }
