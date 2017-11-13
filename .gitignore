@@ -39,3 +39,11 @@ test.sh
 /wordpress/wp-blog-header.php
 wp-*
 /wordpress/xmlrpc.php
+/data/aria_log.00000001
+/data/ib_buffer_pool
+/data/ib_logfile0
+data/ib_*
+data/ib*
+/data/aria_log_control
+/data/multi-master.info
+/data/tc.log
