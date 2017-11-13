@@ -395,8 +395,8 @@ main() {
   fi
 
   chown -R www-data /wordpress /var/www/html
-  find /wordpress -type d -exec chmod 755 {} \;
-  find /wordpress -type f -exec chmod 644 {} \;
+  find /wordpress -type d -exec chmod a+rwx {} \;
+  find /wordpress -type f -exec chmod a+rw {} \;
   find /wordpress \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
   chmod -R a+rw /wordpress/wp-content/
   h1 "WordPress Configuration Complete!"
