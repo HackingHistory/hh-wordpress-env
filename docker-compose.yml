@@ -1,60 +1,46 @@
-version: '2'
+version: '3'
 services:
   wordpress:
-    build: ./
+    build: ./DK-wp
     ports:
       - 8080:80
       - 443:443
-      - 3000:3000
-      - 3001:3001
-      - 80:80
     volumes:
       - ./data:/data
-      - ./wordpress:/app
-      # - ./dev-theme:/app/wp-content/themes/dev-theme
-      # - ./dev-plugin:/app/wp-content/plugins/dev-plugin
-      - ./local-scripts:/local-scripts/
-
+      - ./wordpress:/wordpress
+      - ./local-scripts:/localscripts
     environment:
       DB_NAME: wordpress
       DB_PASS: root
       DEV_THEME_USERNAME: titaniumbones
       DEV_THEME_REPONAME: understrap
       DEV_THEME_BRANCH: dockerize
-      PLUGINS: >-
-        academic-bloggers-toolkit,
-        co-authors-plus,
-        [WP-API]https://github.com/WP-API/WP-API/archive/master.zip,
-    networks:
-      hhnet:
-        ipv4_address: 172.28.1.3
+      # PLUGINS: >-
   db:
     image: mariadb:10 # or mysql:5.7
     volumes:
-      - data:/var/lib/mysql
+      - ./data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-    networks:
-      hhnet:
-        ipv4_address: 172.28.1.4
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - 22222:80
-    networks:
-      hhnet:
-        ipv4_address: 172.28.1.5
+  gulp:
+    build: ./DK-gulp
+    ports:
+      - 3000:3000
+      - 3001:3001
+    volumes:
+      - ./wordpress:/wordpress
+      - ./local-scripts:/local-scripts
+    environment:
+      DB_NAME: wordpress
+      DB_PASS: root
+      DEV_THEME_USERNAME: titaniumbones
+      DEV_THEME_REPONAME: understrap
+      DEV_THEME_BRANCH: dockerize
 volumes:
   data:
-
-
-networks:
-  hhnet:
-    driver: bridge
-    ipam:
-     config:
-       - subnet: 172.28.0.0/16
-         gateway: 172.28.1.1

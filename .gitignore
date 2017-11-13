@@ -36,3 +36,6 @@ test.sh
 /wordpress/wp-admin/admin-post.php
 /wordpress/wp-admin/admin.php
 /wordpress/wp-admin/async-upload.php
+/wordpress/wp-blog-header.php
+wp-*
+/wordpress/xmlrpc.php
