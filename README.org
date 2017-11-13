@@ -1,6 +1,8 @@
 * Install Hacking History wordpress distro painlessly
 
-This set of scripts will set up a Wordpress development environment that will work on any major desktop platform (Mac, Windows, Linux). It is designed around the needs of students in [[https://hackinghistory.ca][Hacking History]], a 4th year undergraduate seminar at the Unviersity of Toronto, and based on the work of of [[https://github.com/visiblevc/wordpress-starter][visiblevc]], from which both the docker image and the run scripts are derived.
+This set of scripts will set up a Wordpress development environment that will work on any major desktop platform (Mac, Windows, Linux). It is designed around the needs of students in [[https://hackinghistory.ca][Hacking History]], a 4th year undergraduate seminar at the Unviersity of Toronto, and based on the work of of [[https://github.com/visiblevc/wordpress-starter][visiblevc]], from which both the wordpress docker image and the wordpress run script are derived.
+
+The first few sections of this README are written for students in  this class. If you're interested in technical details, see [[#technical-introduction][Technical Introduction]], below
 
 ** How it works
 
@@ -14,20 +16,40 @@ We use [[https://docs.docker.com/][Docker]] and [[http://wp-cli.org/][the Wordpr
 - come back and visit http://localhost:8080/ to see the website, whih is running live on your computer!
 
 ** Usage
-- in Atom, edit ~REPOSITORY_ROOT/wp-content/themes/dev-theme/sass/theme/_theme_variables.scss~ or other files in the ~dev-theme~ directory tree. Changes will appear in your browser on refresh.
-- if your computer shuts down, run  ~docker-compose up && docker-compose logs -f wordpress~ again from the appropriate directory to bring the virtual environment back online. It wil only take about a minute the second time.
-** Acknowledgements
-- thanks to *wordpress-starter* for the inspiration and much of the code. Kept it mostly because the color coding is so awesome
-- thanks to the official *wp-cli* image for a starting point
+- in Atom, edit ~REPOSITORY_ROOT/wp-content/themes/understrap/sass/theme/_theme_variables.scss~ or other files in the ~understrap~ directory tree. Note that there is a link, ~understrap~, in the main directory of this repository (so, right next to this file). On Mac and Linux that link should upen up the theme directory directly. I'm interested to learn whether this works on Windows.  Changes should appear immediately in your browser at [[localhost:8080]].
+- if your computer shuts down, run  ~docker-compose up && docker-compose logs -f wordpress~ again from the appropriate directory to bring the virtual environment back online. It will only take about a minute for [[http://localhost:8080]] to come on line the second time, though for some reason ~browser-sync~ takes a little longer to start syncing, maybe 5 minutes.
 
-** TODO
+
+** Understrap
+There is a lot to say about [[https://github.com/titaniumbones/understrap][Understrap]], the theme framework that we might be using. For now you just need to know that you can change just about any css characteristic by modifying the variables file directly in the ~_theme_variables.scss~ file linked to above. You can explore the variable names in ~understrap/src/sass/bootstrap4/_variables.scss~. There's a little more information [[https://understrap.github.io/][online]] but we'll haveto fill in the blanks another way later on.
+
+** Technical Introduction
+~docker-compose.yml~ defines 4 containers:
+- db :: straightforward *mariadb* container, using the official image
+- phpmyadmin :: maybe not really necessary for this project, but sometimes it's convenient to be able to inspect the database
+- wordpress :: based on the *visiblevc/wordpress* container (instead of the oficial wordpress containers). It might make more sense to rebase off of the *wp-cli* images in the future, but *visiblevc*'s run script was a big help.  It will download a set of themes and plugins, activate all the plugins, and finally, activate the development theme (see below)
+- gulp :: this might have been better named "theme" -- essentially, it installs the theme under development and all npm dependencies. It also exposes ports 3000 and 3001, and runs ~gulp watch-bs~, which in our case is a task that watches css compilation & triggers browser-sync on changes.  It's not clear that it needs to be isolated in its own container, but doing so does keep the startup logs cleaner (there are lots of npm messages on every startup). The dev theme needs to include a browser-sync code snippet in ~footer.php~, as browser-sync and wordpress mesh poorly in a containerized environment. The current snippet is:
+          #+BEGIN_SRC html
+<script id="__bs_script__">//<![CDATA[
+    document.write("<script async src='http://HOST:3000/browser-sync/browser-sync-client.js?v=2.18.13'><\/script>".replace("HOST", location.hostname));
+//]]></script>
+          #+END_SRC
+          (but you might want to just check the message at [[http://localhost:3001]] and ensure that your snippet version is correct).
+Another, slightly more involved solution, would be to use ~nginx-proxy~ image as a reverse proxy for the docker containers; this is a bit beyond my skills, though.
+
+** Acknowledgments
+- this package uses [[https://github.com/visiblevc/wordpress-starter/][wordpress-starter]] as a starting point, including reusing much of the ~run.sh~ code for the wordpress container.
+- thanks also to the official *wp-cli* image for a starting point
+- we also use *node-gulp-bower* as an image
+
+** To do
 - [ ] check whether I can use apt-get or not. If not, need to rewrite the wp-cli code
 - [ ] decide how  to manage db import and syncing.  Might be easier to use a plugin, and maybe (???) even write a row to the db with a secret key passed as an environment variable (that could work with dp-sync, for instance)
 - [X] remove all deprecated stuff.
 - [X] don't fail if DB already exists. Instead, continue silently.
 - [ ] remove multisite stuff, I think
 - [X] add a "build-finalizer" for completely local steps. Like, maybe we could add gulp watch.
-- [ ] but since this last step will depend on the theme, maybe the smart thing to do is to add this script to the theme repo
+- [X] but since this last step will depend on the theme, maybe the smart thing to do is to add this script to the theme repo
   - In which case might be better to call it something else.
   - like, there might be a ~wp-docker-final-script.sh~ in the foot dir of the theme
   - which just does a ~npm install -d && gulp watch~. That would be cool.
