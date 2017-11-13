@@ -82,10 +82,10 @@ get_dev_theme
 
 echo "installing node modules"
 cd $BASEDIR/$DEV_THEME_REPONAME
-npm install gulp
+# npm install gulp
 npm install -d
 
 while true; do
- echo "wathcing for changes"
+ echo "watching for changes"
  gulp watch-bs
 done
