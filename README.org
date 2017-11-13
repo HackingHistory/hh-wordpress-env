@@ -18,9 +18,15 @@ We use [[https://docs.docker.com/][Docker]] and [[http://wp-cli.org/][the Wordpr
 ** Usage
 - in Atom, edit ~REPOSITORY_ROOT/wp-content/themes/understrap/sass/theme/_theme_variables.scss~ or other files in the ~understrap~ directory tree. Note that there is a link, ~understrap~, in the main directory of this repository (so, right next to this file). On Mac and Linux that link should upen up the theme directory directly. I'm interested to learn whether this works on Windows.  Changes should appear immediately in your browser at [[localhost:8080]].
 - if your computer shuts down, run  ~docker-compose up && docker-compose logs -f wordpress~ again from the appropriate directory to bring the virtual environment back online. It will only take about a minute for [[http://localhost:8080]] to come on line the second time, though for some reason ~browser-sync~ takes a little longer to start syncing, maybe 5 minutes.
-
-
-** Understrap
+*** Files
+You'll want to ignore most of the files you find here, but here's an explanation:
+- ~docker-compose.yml~ defines the various containers we will use and sets some variable values.
+- ~DK-wp~ and ~DK-gulp~ contain one "Dockerfile" and one "run script" each. The Dockerfile defines a container and gives instructions for what to download, while the run script is a set of instructions that will be executed after the container has been built, and run every time the container is started with ~docker-compose up~ or ~docker-compose start~.
+- ~understrap~ is a "symbolic link" or shortcut to the understrap theme, which which we are working. A full github repo will be downloaded to this location, and when you pull & push from there, your changes will eventually make it to our development server.
+- ~wordpress~ contains all the files for our wordpress installation
+- ~data~ contains all the database files that make wordpress work
+- the other files are pretty technical: ~.gitignore~ tells git to ignore certain files to they don't get in the way, ~.editorconfig~ tells Atom what style conventions to use (you will need to install the [[https://atom.io/packages/editorconfig][editorconfig plugin]], ~Changelog.md~ preserves a set of changes from an older project, ~local-scripts~ is deprecated and will be removed soon, and ~.github~ has a template for reporting issues.
+*** Understrap
 There is a lot to say about [[https://github.com/titaniumbones/understrap][Understrap]], the theme framework that we might be using. For now you just need to know that you can change just about any css characteristic by modifying the variables file directly in the ~_theme_variables.scss~ file linked to above. You can explore the variable names in ~understrap/src/sass/bootstrap4/_variables.scss~. There's a little more information [[https://understrap.github.io/][online]] but we'll haveto fill in the blanks another way later on.
 
 ** Technical Introduction
