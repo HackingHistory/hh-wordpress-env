@@ -19,6 +19,7 @@ AFTER_URL="${URL_REPLACE#*,}"
 # dev theme option
 # I don't know how to do the replacement in bash so skipping
 # DEV_THEME_NAME=${DEV_THEME_NAME:"${DEV_THEME_URL:"}
+DEV_THEME_BRANCH=${DEV_THEME_BRANCH:-master}
 
 declare -A plugin_deps
 declare -A theme_deps
@@ -28,6 +29,7 @@ declare -A theme_volumes
 # Apache configuration
 # --------------------
 sed -i "s/#ServerName www.example.com/ServerName $SERVER_NAME\nServerAlias www.$SERVER_NAME/" /etc/apache2/sites-available/000-default.conf
+# sed -i "s/\/app\//\/wordpress\//" /etc/apache2/sites-available/000-default.conf
 
 # WP-CLI configuration
 # ---------------------
@@ -116,11 +118,11 @@ _get_volumes() {
   local names=()
 
   filenames=$(
-    find /app/wp-content/"$volume_type"/* -maxdepth 0 -type f ! -name 'index*' -print0 2>/dev/null |
+    find /wordpress/wp-content/"$volume_type"/* -maxdepth 0 -type f ! -name 'index*' -print0 2>/dev/null |
     xargs -0 -I {} basename {} .php
   )
   dirnames=$(
-    find /app/wp-content/"$volume_type"/* -maxdepth 0 -type d -print0 2>/dev/null |
+    find /wordpress/wp-content/"$volume_type"/* -maxdepth 0 -type d -print0 2>/dev/null |
     xargs -0 basename -a 2>/dev/null
   )
   names=( $filenames $dirnames )
@@ -198,13 +200,13 @@ init() {
 
   # Download WordPress
   # ------------------
-  if [[ ! -f /app/wp-settings.php ]]; then
+  if [[ ! -f /wordpress/wp-settings.php ]]; then
     h2 "Downloading WordPress"
     _wp core download --version="$WP_VERSION"
     _log_last_exit_colorize "Success: Wordpress downloaded" "Error: Wordpress download failed!"
   fi
 
-  chown -R www-data /app/wp-content
+  chown -R www-data /wordpress/wp-content
 }
 
 check_database() {
@@ -300,38 +302,38 @@ check_themes() {
 # do something similar for dev plugin I guess
 get_dev_theme() {
   echo "vars $DEV_THEME_REPONAME $DEV_THEME_USERNAME"
-  if [[ $DEV_THEME_USERNAME && $DEV_THEME_REPONAME ]]; then
-    if [ -z "$(ls -A /app/wp-content/themes/dev-theme/)" ]; then
-      cd /app/wp-content/themes/
-      git clone "https://github.com/$DEV_THEME_USERNAME/${DEV_THEME_REPONAME}.git" \
-          /app/wp-content/themes/dev-theme/
-      _log_last_exit_colorize "Success: $DEV_THEME_URL repo has been cloned."\
-                              "Error: unable to clone $DEV_THEME_URL"
-    else
-      echo "dev-theme folder not empty, not cloning"
-    fi
-  elif [[ $DEV_THEME_REPONAME || $DEV_THEME_USERNAME ]]; then
-    echo "Please provide both the DEV_THEME_USERNAME and the DEV_THEME_REPONAME variables in order to download the dev theme"
-  else
-    echo "No Dev Theme URL provided"
-  fi
-  chmod -R a+rw /app/wp-content/themes/dev-theme/
-  _wp theme activate dev-theme
-  _log_last_exit_colorize "Success: activated $DEV_THEME_URL theme." \
-                              "Error: unable to activate $DEV_THEME_URL"
+  # if [[ $DEV_THEME_USERNAME && $DEV_THEME_REPONAME ]]; then
+  #   if [ -z "$(ls -A /wordpress/wp-content/themes/$DEV_THEME_REPONAME/)" ]; then
+  #     cd /wordpress/wp-content/themes/
+  #     git clone --branch $DEV_THEME_BRANCH  "https://github.com/$DEV_THEME_USERNAME/${DEV_THEME_REPONAME}.git" \
+  #         /wordpress/wp-content/themes/$DEV_THEME_REPONAME
+  #     _log_last_exit_colorize "Success: $DEV_THEME_URL repo has been cloned."\
+  #                             "Error: unable to clone $DEV_THEME_URL"
+  #   else
+  #     echo "dev-theme folder not empty, not cloning"
+  #   fi
+  # elif [[ $DEV_THEME_REPONAME || $DEV_THEME_USERNAME ]]; then
+  #   echo "Please provide both the DEV_THEME_USERNAME and the DEV_THEME_REPONAME variables in order to download the dev theme"
+  # else
+  #   echo "No Dev Theme URL provided"
+  # fi
+  # chmod -R a+rw /wordpress/wp-content/themes/$DEV_THEME_REPONAME
+  _wp theme activate $DEV_THEME_REPONAME || _log_last_exit_colorize \
+                                              "Success: activated $DEV_THEME_URL theme." \
+                                              "Error: unable to activate $DEV_THEME_URL"
   }
 function add_local_scripts() {
   echo "made it into add_local_scripts"
-  # for f in "/app/wp-content/themes/local-scripts"/*; do
+  # for f in "/wordpress/wp-content/themes/local-scripts"/*; do
   #  echo "trying to run $f"
   #  if [[ -f $f ]]; then
-  #     exec /app/wp-content/themes/local-scripts/$f &
+  #     exec /wordpress/wp-content/themes/local-scripts/$f &
   #     _log_last_exit_colorize "Success: /local-scripts/$f ran without errors." \
   #                             "Failure: unable to run /local-scripts/$f ."
   #  fi
   # done
   echo "running watch-underscores manually"
-  /local-scripts/watch-underscores.sh &
+  /local-scripts/watch-understrap.sh &
   echo "any sign of success"?
 
 }
@@ -348,7 +350,7 @@ main() {
   done
 
   h2 "Configuring WordPress"
-  rm -f /app/wp-config.php
+  rm -f /wordpress/wp-config.php
   _wp core config
   _log_last_exit_colorize "Success: core config" "Error: core config failed!"
 
@@ -367,11 +369,20 @@ main() {
   h2 "Checking plugins"
   check_plugins
 
+  # Wait for MySQL
+  # --------------
+  h2 "Waiting for MySQL to initialize..."
+  while ! mysqladmin ping --host="$DB_HOST" --password="$DB_PASS" --silent; do
+   sleep 1
+  done
+
+
   h2 "Installing development theme"
+  /wait-for-it.sh gulp:3001 -t 0 -- echo "gulp is up, activating script"
   get_dev_theme
 
-  h2 "Running local scripts from /local-scripts directory"
-  add_local_scripts
+  # h2 "Running local scripts from /local-scripts directory"
+  # add_local_scripts
 
   h2 "Finalizing"
   if [[ "$MULTISITE" != 'true' ]]; then
@@ -382,11 +393,11 @@ main() {
     _log_last_exit_colorize "Success: rewrite flush" "Error: rewrite flush failed!"
   fi
 
-  chown -R www-data /app /var/www/html
-  find /app -type d -exec chmod 755 {} \;
-  find /app -type f -exec chmod 644 {} \;
-  find /app \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
-  chmod -R a+rw /app/wp-content/
+  chown -R www-data /wordpress /var/www/html
+  find /wordpress -type d -exec chmod 755 {} \;
+  find /wordpress -type f -exec chmod 644 {} \;
+  find /wordpress \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
+  chmod -R a+rw /wordpress/wp-content/
   h1 "WordPress Configuration Complete!"
 
   rm -f /var/run/apache2/apache2.pid
