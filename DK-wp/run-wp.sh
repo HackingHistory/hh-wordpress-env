@@ -291,11 +291,12 @@ check_themes() {
     [[ ${theme_volumes[$theme]} ]] && continue
     to_remove+=( "$theme" )
   done
-
-  for key in "${to_remove[@]}"; do
-    wp theme delete --allow-root "$key"
-    _log_last_exit_colorize "Success: $key theme deleted" "Error: $key theme delete failed!"
-  done
+  # deleting for now as it removes underscores by default!
+  # need to just add underscores to the theme think
+  # for key in "${to_remove[@]}"; do
+  #   wp theme delete --allow-root "$key"
+  #   _log_last_exit_colorize "Success: $key theme deleted" "Error: $key theme delete failed!"
+  # done
 
 }
 
