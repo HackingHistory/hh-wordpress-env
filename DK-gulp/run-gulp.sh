@@ -75,6 +75,7 @@ get_dev_theme() {
   fi
   chmod -R a+rw $BASEDIR/$DEV_THEME_REPONAME
 
+
 }
 
 echo "getting dev theme"
@@ -84,6 +85,7 @@ echo "installing node modules"
 cd $BASEDIR/$DEV_THEME_REPONAME
 # npm install gulp
 npm install -d
+chmod -R a+rx node_modules
 
 while true; do
  echo "watching for changes"

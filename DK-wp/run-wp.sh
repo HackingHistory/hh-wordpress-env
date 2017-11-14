@@ -395,9 +395,9 @@ main() {
   fi
 
   chown -R www-data /wordpress /var/www/html
-  find /wordpress -type d -exec chmod a+rwx {} \;
-  find /wordpress -type f -exec chmod a+rw {} \;
-  find /wordpress \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
+  find /wordpress -path /wordpress/wp-content/themes/understrap -prune -o -type d -exec chmod a+rwx {} \;
+  find /wordpress -path /wordpress/wp-content/themes/understrap -prune -o -type f -exec chmod a+rw {} \;
+  find /wordpress -path /wordpress/wp-content/themes/understrap -prune -o  \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
   chmod -R a+rw /wordpress/wp-content/
   h1 "WordPress Configuration Complete!"
 
