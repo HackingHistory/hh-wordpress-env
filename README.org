@@ -9,8 +9,8 @@ The first few sections of this README are written for students in  this class. I
 We use [[https://docs.docker.com/][Docker]] and [[http://wp-cli.org/][the Wordpress Command Line Interface]] to construct a "virtual environment" on your laptop. Wordpress and all the other services it depends on  (including a webserver and  a database server) will run in "containers" which can be accessed through the *command line*. You can also browse the local Wordpress site by pointing your browser at [[http://localhost:8080][localhost:8080]], and you can edit the theme files in Atom. Any changes you make will be visible in the browser window on refresh.
 ** Installation
 - first get ready by downloading [[https://www.docker.com/][Docker]] for [[https://www.docker.com/docker-mac][Mac]] or [[https://www.docker.com/docker-windows][Windows]] (if you are using Linux, use the terminal!)
-- clone this repo with Github desktop or directly with  ~git clone https://github.com/titaniumbones/wordpress-starter~
-- If you use Github, Desktop, the repository will probably be saved to ~/Users/yourname/Github/repositories/wordpress-starter/~ (Mac), or ~C:\User\Github\repositories\wprdpress-starter~. Navigate to that location using a terminal (Mac) or the "Powershell" environment that comes with DOcker for Windows (Windows).
+- clone this repo with Github desktop or directly with  ~git clone https://github.com/titaniumbones/hh-wordpress-env~
+- If you use Github, Desktop, the repository will probably be saved to ~/Users/yourname/Github/repositories/hh-wordpress-env/~ (Mac), or ~C:\User\Github\repositories\hh-wordpress-env~. Navigate to that location using a terminal (Mac) or the "Powershell" environment that comes with DOcker for Windows (Windows).
 - From the main repository, run ~docker-compose up && docker-compose logs -f wordpress~. THe first time you do this, the process will ake about 10 minutes, so
 - go get a cup of coffee
 - come back and visit http://localhost:8080/ to see the website, whih is running live on your computer!
