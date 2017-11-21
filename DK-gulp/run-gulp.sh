@@ -87,6 +87,8 @@ cd $BASEDIR/$DEV_THEME_REPONAME
 npm install -d
 chmod -R a+rwx node_modules
 
+# wait one minute before watchingb/c otherwise we have race condiion somehow
+sleep 60
 while true; do
  echo "watching for changes"
  gulp watch-bs
