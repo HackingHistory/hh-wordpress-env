@@ -4,7 +4,7 @@ DEV_THEME_BRANCH=${DEV_THEME_BRANCH:-master}
 DEV_THEME_USERNAME=${DEV_THEME_USERNAME:-titaniumbones}
 DEV_THEME_REPONAME=${DEV_THEME_REPONAME:-understrap}
 BASEDIR=/wordpress/wp-content/themes
-
+WATCH_CMD=${WATCH_CMD:-"gulp watch-bs"}
 # Helpers
 # ---------------------
 
@@ -91,5 +91,6 @@ chmod -R a+rwx node_modules
 sleep 60
 while true; do
  echo "watching for changes"
- gulp watch-bs
+ # this should really be a variable set above
+ eval "$WATCH_CMD"
 done

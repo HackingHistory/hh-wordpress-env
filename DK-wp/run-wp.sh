@@ -19,6 +19,7 @@ AFTER_URL="${URL_REPLACE#*,}"
 # dev theme option
 # I don't know how to do the replacement in bash so skipping
 # DEV_THEME_NAME=${DEV_THEME_NAME:"${DEV_THEME_URL:"}
+DEV_THEME_REPONAME=${DEV_THEME_REPONAME:-understrap}
 DEV_THEME_BRANCH=${DEV_THEME_BRANCH:-master}
 
 declare -A plugin_deps
@@ -309,17 +310,6 @@ activate_dev_theme() {
   }
 function add_local_scripts() {
   echo "made it into add_local_scripts"
-  # for f in "/wordpress/wp-content/themes/local-scripts"/*; do
-  #  echo "trying to run $f"
-  #  if [[ -f $f ]]; then
-  #     exec /wordpress/wp-content/themes/local-scripts/$f &
-  #     _log_last_exit_colorize "Success: /local-scripts/$f ran without errors." \
-  #                             "Failure: unable to run /local-scripts/$f ."
-  #  fi
-  # done
-  echo "running watch-underscores manually"
-  /local-scripts/watch-understrap.sh &
-  echo "any sign of success"?
 
 }
 
@@ -356,7 +346,7 @@ main() {
 
 
   h2 "Installing development theme"
-  /wait-for-it.sh gulp:3001 -t 0 -- echo "gulp is up, activating script"
+  /wait-for-it.sh gulp:3001 -t 0 -- echo "gulp is up, activating theme"
   activate_dev_theme
 
   # h2 "Running local scripts from /local-scripts directory"
@@ -372,9 +362,9 @@ main() {
   fi
 
   chown -R www-data /wordpress /var/www/html
-  find /wordpress -path "*understrap" -prune -o -type d -exec chmod a+rwx {} \;
-  find /wordpress -path "*understrap" -prune -o -type f -exec chmod a+rw {} \;
-  find /wordpress -path "*understrap" -prune -o  \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
+  find /wordpress -path "*$DEV_THEME_REPONAME" -prune -o -type d -exec chmod a+rwx {} \;
+  find /wordpress -path "*$DEV_THEME_REPONAME" -prune -o -type f -exec chmod a+rw {} \;
+  find /wordpress -path "*$DEV_THEME_REPONAME" -prune -o  \( -type f -or -type d \) ! -group www-data -exec chmod g+rw {} \;
   # chmod -R a+rw /wordpress/wp-content/
   h1 "WordPress Configuration Complete!"
 
