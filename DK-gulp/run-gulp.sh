@@ -85,7 +85,7 @@ echo "installing node modules"
 cd $BASEDIR/$DEV_THEME_REPONAME
 # npm install gulp
 npm install -d
-chmod -R a+rx node_modules
+chmod -R a+rwx node_modules
 
 while true; do
  echo "watching for changes"
