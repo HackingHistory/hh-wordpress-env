@@ -13,8 +13,8 @@ services:
       DB_NAME: wordpress
       DB_PASS: root
       DEV_THEME_USERNAME: HackingHistory
-      DEV_THEME_REPONAME: FoundationPress
-      DEV_THEME_BRANCH: dockerize
+      DEV_THEME_REPONAME: JointsWP
+      DEV_THEME_BRANCH: feature/dockerize
       # PLUGINS: >-
   db:
     image: mariadb:10 # or mysql:5.7
@@ -40,8 +40,8 @@ services:
       DB_NAME: wordpress
       DB_PASS: root
       DEV_THEME_USERNAME: HackingHistory
-      DEV_THEME_REPONAME: FoundationPress
-      DEV_THEME_BRANCH: dockerize
-      WATCH_CMD: "npm start"
+      DEV_THEME_REPONAME: JointsWP
+      DEV_THEME_BRANCH: feature/dockerize
+      WATCH_CMD: "npm run browsersync"
 volumes:
   data:
