@@ -5,7 +5,10 @@ FROM node:6-alpine
 
 MAINTAINER Matt Price <matt.rice@utoronto.ca>
 # Install dependencies
-RUN apk add --quiet --no-cache bash git && \
+RUN apk add --quiet --no-cache bash git python build-base && \
+    python -m ensurepip && \
+    rm -r /usr/lib/python*/ensurepip && \
+    pip install --upgrade pip setuptools && \
     yarn global add bower gulp && \
     yarn cache clean && \
     rm -rf /var/cache/apk/* /tmp/*
