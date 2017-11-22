@@ -42,5 +42,6 @@ services:
       DEV_THEME_USERNAME: HackingHistory
       DEV_THEME_REPONAME: FoundationPress
       DEV_THEME_BRANCH: dockerize
+      WATCH_CMD: "npm start"
 volumes:
   data:

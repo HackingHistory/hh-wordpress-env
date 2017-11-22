@@ -9,8 +9,8 @@ RUN apk add --quiet --no-cache bash git python build-base && \
     python -m ensurepip && \
     rm -r /usr/lib/python*/ensurepip && \
     pip install --upgrade pip setuptools && \
-    yarn global add bower gulp && \
-    yarn cache clean && \
+    # yarn global add bower gulp && \
+    # yarn cache clean && \
     rm -rf /var/cache/apk/* /tmp/*
 
 COPY ./run-gulp.sh /
