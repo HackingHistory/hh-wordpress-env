@@ -1,7 +1,7 @@
 #!/bin/bash
 # need to update to use dev names
 DEV_THEME_BRANCH=${DEV_THEME_BRANCH:-master}
-DEV_THEME_USERNAME=${DEV_THEME_USERNAME:-titaniumbones}
+DEV_THEME_USERNAME=${DEV_THEME_USERNAME:-HackingHistory}
 DEV_THEME_REPONAME=${DEV_THEME_REPONAME:-understrap}
 BASEDIR=/wordpress/wp-content/themes
 

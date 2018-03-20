@@ -12,7 +12,7 @@ services:
     environment:
       DB_NAME: wordpress
       DB_PASS: root
-      DEV_THEME_USERNAME: titaniumbones
+      DEV_THEME_USERNAME: HackingHistory
       DEV_THEME_REPONAME: understrap
       DEV_THEME_BRANCH: dockerize
       # PLUGINS: >-
@@ -39,7 +39,7 @@ services:
     environment:
       DB_NAME: wordpress
       DB_PASS: root
-      DEV_THEME_USERNAME: titaniumbones
+      DEV_THEME_USERNAME: HackingHistory
       DEV_THEME_REPONAME: understrap
       DEV_THEME_BRANCH: dockerize
 volumes:
