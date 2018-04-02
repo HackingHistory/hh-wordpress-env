@@ -90,7 +90,7 @@ npm install -d
 npm install -g gulp gulp-cli
 chmod -R a+rwx node_modules
 
-# wait one minute before watchingb/c otherwise we have race condiion somehow
+# wait before watching b/c otherwise we have race condiion somehow
 sleep 45
 while true; do
  echo "watching for changes"
