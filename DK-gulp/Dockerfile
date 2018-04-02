@@ -1,4 +1,4 @@
-FROM monostream/nodejs-gulp-bower
+FROM mcreations/gulp-bower
 COPY ./run-gulp.sh /
 RUN chmod a+x /run-gulp.sh \
     && mkdir -p /wordpress/wp-content/themes/

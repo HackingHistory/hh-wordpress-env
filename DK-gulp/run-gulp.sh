@@ -85,11 +85,16 @@ echo "installing node modules"
 cd $BASEDIR/$DEV_THEME_REPONAME
 # npm install gulp
 npm install -d
+# this last is almost certainly unnecessary but doesn't do any harm, apart from
+# a small additional latency
+npm install -g gulp gulp-cli
 chmod -R a+rwx node_modules
 
 # wait one minute before watchingb/c otherwise we have race condiion somehow
-sleep 60
+sleep 45
 while true; do
  echo "watching for changes"
  gulp watch-bs
+ # just for diagnostic purposes, otherwise log becomes unreadable
+ sleep 5
 done
